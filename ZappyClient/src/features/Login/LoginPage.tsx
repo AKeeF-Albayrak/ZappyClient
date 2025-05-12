@@ -2,17 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FloatingLabelInput } from '../../components/floating-label-input';
 import { CustomCheckbox } from '../../components/custom-checkbox';
+import useLogin from './useLogin';
 
 const animationStyles = `
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in-up {
@@ -29,42 +24,70 @@ const animationStyles = `
 .animation-delay-700 { animation-delay: 0.7s; }
 .animation-delay-800 { animation-delay: 0.8s; }
 
-/* Button animations - Simple Scale */
 .btn-scale {
   background-color: #9333ea;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
 .btn-scale:hover {
   background-color: #7e22ce;
   transform: scale(1.02);
 }
-
 .btn-scale:active {
   transform: scale(0.98);
+}
+
+/* 🔄 Custom dual-color clip-path loader */
+.loader {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 1s linear infinite;
+}
+.loader::before,
+.loader::after {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 50%;
+  border: 3px solid #FFF;
+  animation: prixClipFix 2s linear infinite;
+}
+.loader::after {
+  transform: rotate3d(90, 90, 0, 180deg);
+  border-color: #FFF;
+}
+
+@keyframes rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes prixClipFix {
+  0%   { clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0); }
+  50%  { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0); }
+  75%, 100% { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%); }
 }
 `;
 
 
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
+  const { login, isLoading, error } = useLogin();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [key, setKey] = useState(0);
 
-  // This effect will run when the component mounts or when the route changes
   useEffect(() => {
-    // Reset the key to force animation replay
     setKey(prevKey => prevKey + 1);
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Remember Me:', rememberMe);
+    login(username, password);
   };
 
   const handleImageError = () => {
@@ -73,11 +96,8 @@ const LoginPage = () => {
 
   return (
     <>
-      {/* Add the styles to the page */}
       <style>{animationStyles}</style>
-      
       <div className="flex h-screen">
-        {/* Left Side (Login Form) */}
         <div className="flex-1 flex flex-col justify-center items-center bg-white p-8 overflow-hidden">
           <div key={key} className="w-full max-w-sm">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6 animate-fade-in-up">Welcome back</h2>
@@ -86,15 +106,15 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit} className="w-full space-y-6">
               <div className="animate-fade-in-up animation-delay-200">
                 <FloatingLabelInput
-                  id="email"
-                  type="email"
-                  label="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="username"
+                  type="username"
+                  label="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
-              
+
               <div className="animate-fade-in-up animation-delay-300">
                 <FloatingLabelInput
                   id="password"
@@ -105,7 +125,7 @@ const LoginPage = () => {
                   required
                 />
               </div>
-              
+
               <div className="flex items-center justify-between animate-fade-in-up animation-delay-400">
                 <CustomCheckbox
                   id="remember"
@@ -113,31 +133,35 @@ const LoginPage = () => {
                   checked={rememberMe}
                   onChange={() => setRememberMe(!rememberMe)}
                 />
-                <a href="#" className="text-sm text-purple-600 hover:underline">
-                  Forgot password?
-                </a>
+                <a href="#" className="text-sm text-purple-600 hover:underline">Forgot password?</a>
               </div>
 
               <div className="animate-fade-in-up animation-delay-500">
                 <button
-                    type="submit"
-                    className="w-full py-2.5 text-white rounded-lg btn-scale"
+                  type="submit"
+                  className="w-full py-2.5 text-white rounded-lg btn-scale flex justify-center items-center gap-2"
+                  disabled={isLoading}
                 >
-                    Sign in
+                  {isLoading ? (
+                    <span className="loader"></span>
+                  ) : (
+                    "Sign In"
+                  )}
                 </button>
+
+
               </div>
+
+              {error && <p className="text-center text-red-600 mt-2">{error}</p>}
 
               <p className="mt-4 text-center text-sm text-gray-600 animate-fade-in-up animation-delay-500">
                 Don't have an account?{" "}
-                <Link to="/sign-up" className="text-purple-600 hover:underline">
-                  Sign up
-                </Link>
+                <Link to="/sign-up" className="text-purple-600 hover:underline">Sign up</Link>
               </p>
             </form>
           </div>
         </div>
 
-        {/* Right Side (Image) */}
         <div className="flex-1 bg-purple-600 flex items-center justify-center">
           {!imageError ? (
             <img
