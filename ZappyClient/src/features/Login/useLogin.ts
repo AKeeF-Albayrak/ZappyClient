@@ -1,11 +1,9 @@
-// src/features/auth/useLogin.ts
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "./loginService";
 import { LoginResponse } from "./loginTypes";
 import { getClientIp, getUserAgent, getDeviceInfo } from "../../utils/clientInfo";
 import { toast } from "react-toastify";
-
 
 const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,23 +21,26 @@ const useLogin = () => {
       const userAgent = getUserAgent();
       const deviceInfo = getDeviceInfo();
 
+
       const response = await authService.login({
         userName: username,
         password: password,
         ipAdress,
         deviceInfo,
-        userAgent
+        userAgent,
       });
 
       await delay(2000);
-
+      navigate("/home");
       if (response.succeeded) {
         setUser(response);
         localStorage.setItem("accessToken", response.accessToken);
         localStorage.setItem("refreshToken", response.refreshToken);
+
         toast.success("Giriş başarılı!");
+        await delay(2000);
         navigate("/home");
-      } else {
+      }else {
         setError(response.message || "Giriş başarısız.");
         toast.error(response.message || "Hatalı kullanıcı adı ya da şifre.");
       }
@@ -51,7 +52,6 @@ const useLogin = () => {
       setIsLoading(false);
     }
   };
-
 
   return { login, isLoading, error, user };
 };

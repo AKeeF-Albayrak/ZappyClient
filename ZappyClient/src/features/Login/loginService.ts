@@ -8,8 +8,6 @@ const login = async (requestData: LoginRequest): Promise<LoginResponse> => {
   return response.data;
 };
 
-const authService = {
+export default {
   login,
 };
-
-export default authService;

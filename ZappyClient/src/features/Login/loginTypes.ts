@@ -12,4 +12,3 @@ export interface LoginRequest {
   deviceInfo: string;
   userAgent: string;
 }
-
