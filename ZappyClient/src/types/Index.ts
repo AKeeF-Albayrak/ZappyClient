@@ -1,58 +1,88 @@
 export interface User {
-  id: number
+  id: string
   name: string
   image: string
   status: string
   statusMessage?: string
 }
 
-export interface Message {
-  id: number
-  senderId: number
-  content: string
-  time: string
-  isStarred?: boolean
+export interface GroupsViewModel {
+    groupId: string;
+    groupPhoto: Uint8Array;
+    lastMessage: LastMessageViewModel;
+    groupName: string;
 }
 
-export interface Group {
-  id: number
-  name: string
-  image: string
-  status: string
-  lastMessage: {
-    sender: string
-    content: string
-    time: string
-  }
-  members: {
-    id: number
-    name: string
-    image: string
-    status: string
-  }[]
-  messages: Message[]
+export interface LastMessageViewModel {
+  id: string;
+  content: string;
+  senderName: string;
+  isUser: boolean;
+  time : string;
 }
 
-export interface Friend {
-  id: number
-  name: string
-  image: string
-  status: string
-  lastMessage?: {
-    content: string
-    time: string
-    isOutgoing: boolean
-  }
+export interface GroupViewModel {
+  id: string;
+  name: string;
+  groupPicture: Uint8Array;
+  messages: MessageViewModel[];
+  users: UserViewModel[];
+  GroupReadStatuses: GroupReadStatusViewModel[];
 }
 
-export interface FriendRequest {
-  id: number
-  user: {
-    id: number
-    name: string
-    image: string
-  }
-  time: string
-  type: "incoming" | "outgoing"
-  mutualFriends?: number
+export interface MessageViewModel {
+  id: string;
+  createdDate: string;
+  senderUsername: string;
+  isUser: boolean;
+  isStarred: boolean;
+  ContentType: MessageContentType;
+  content: string;
+  isPinned: boolean;
+  repliedMessageId?: string;
+}
+
+export interface UserViewModel {
+  username: string;
+  profilePicture: Uint8Array;
+  isOnline: boolean;
+}
+
+export interface GroupReadStatusViewModel {
+  username: string;
+  lastReadAt: string;
+}
+
+export interface StarredMessageViewModel {
+  messageId: string;
+  groupId: string;
+  content: string;
+  createdDate: string;
+  senderUsername: string;
+}
+
+export interface FriendViewModel {
+  username: string;
+  status: User_Status;
+}
+
+export enum MessageContentType {
+  Text = "Text",
+  Audio = "Audio",
+  Picture = "Picture",
+}
+
+export enum User_Status {
+  Offline = "Offline",
+  Online = "Online",
+  Away = "Away",
+  Invisible = "Invisible",
+  Idle = "Idle",
+}
+
+export enum FriendshipStatus {
+  Pending = "Pending",
+  Accepted = "Accepted",
+  Declined = "Declined",
+  Blocked = "Blocked",
 }

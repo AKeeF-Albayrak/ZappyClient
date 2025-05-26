@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { X, UserPlus, Search } from "lucide-react"
+import homeService from "../features/Home/homeService"
 
 interface AddFriendModalProps {
   onClose: () => void
@@ -23,41 +24,22 @@ export default function AddFriendModal({ onClose, onAddFriend, themeClasses }: A
   const [searchResults, setSearchResults] = useState<{ id: number; name: string; image: string }[]>([])
   const [isSearching, setIsSearching] = useState(false)
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!username.trim()) return
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username.trim()) return;
 
-    setIsSearching(true)
+    setIsSearching(true);
+    try {
+      const results = await homeService.searchUsers(username);
+      setSearchResults(results);
+    } catch (error) {
+      console.error("User search failed:", error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
-    // Simulate search results - in a real app, this would be an API call
-    setTimeout(() => {
-      if (username.toLowerCase().includes("john")) {
-        setSearchResults([
-          {
-            id: 101,
-            name: "John Smith",
-            image: "/placeholder.svg?height=50&width=50",
-          },
-          {
-            id: 102,
-            name: "Johnny Walker",
-            image: "/placeholder.svg?height=50&width=50",
-          },
-        ])
-      } else if (username.toLowerCase().includes("a")) {
-        setSearchResults([
-          {
-            id: 103,
-            name: "Alice Johnson",
-            image: "/placeholder.svg?height=50&width=50",
-          },
-        ])
-      } else {
-        setSearchResults([])
-      }
-      setIsSearching(false)
-    }, 1000)
-  }
 
   return (
     <div className="p-6">
@@ -71,7 +53,7 @@ export default function AddFriendModal({ onClose, onAddFriend, themeClasses }: A
       <form onSubmit={handleSearch}>
         <div className="mb-6">
           <label htmlFor="username" className="block text-sm font-medium text-gray-400 mb-1">
-            Find by Username or Email
+            Find by Username
           </label>
           <div className="relative">
             <input
@@ -80,11 +62,11 @@ export default function AddFriendModal({ onClose, onAddFriend, themeClasses }: A
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full pl-10 pr-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Enter username or email"
+              placeholder="Enter username"
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
-          <p className="text-xs text-gray-400 mt-2">You can add friends by their username or email address.</p>
+          <p className="text-xs text-gray-400 mt-2">You can add friends by their username.</p>
         </div>
 
         <button

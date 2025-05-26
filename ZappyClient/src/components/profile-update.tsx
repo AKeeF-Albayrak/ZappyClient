@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { X } from "lucide-react"
 import { User } from "../types/Index"
+import homeService from "../features/Home/homeService"
 
 interface ProfileUpdateProps {
   user: User
@@ -26,15 +26,23 @@ export default function ProfileUpdate({ user, onUpdate, onClose, themeClasses }:
   const [statusMessage, setStatusMessage] = useState(user.statusMessage || "")
   const [image, setImage] = useState(user.image)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onUpdate({
+    const updatedUser = {
       ...user,
       name,
       status,
       statusMessage,
       image,
-    })
+    }
+    
+    try {
+      // Backend'e kullanıcı güncellemesi gönder
+      const updatedUserFromBackend = await homeService.updateUserProfile(updatedUser)
+      onUpdate(updatedUserFromBackend)  // Güncellenen kullanıcıyı üst component'e gönder
+    } catch (error) {
+      console.error("Error updating profile", error)
+    }
   }
 
   return (

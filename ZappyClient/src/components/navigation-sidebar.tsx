@@ -2,6 +2,7 @@
 
 import { MessageSquare, Star, Settings, Users, UserPlus } from "lucide-react"
 import { User } from "../types/Index"
+import homeService from "../features/Home/homeService" 
 
 interface NavigationSidebarProps {
   activeTab: "chats" | "settings" | "starred" | "friends" | "requests"
@@ -27,6 +28,16 @@ export default function NavigationSidebar({
   themeClasses,
   pendingRequestsCount = 0,
 }: NavigationSidebarProps) {
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      await homeService.logout(); // Calling the logout service method
+      window.location.href = "/login"; // Redirect to login page after logout
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   return (
     <div
       className={`w-16 ${themeClasses.bg} flex flex-col items-center border-r ${themeClasses.border} transition-all duration-300 z-20`}
@@ -40,10 +51,10 @@ export default function NavigationSidebar({
               user.status === "online"
                 ? "bg-green-500"
                 : user.status === "busy"
-                  ? "bg-red-500"
-                  : user.status === "away"
-                    ? "bg-yellow-500"
-                    : "bg-gray-400"
+                ? "bg-red-500"
+                : user.status === "away"
+                ? "bg-yellow-500"
+                : "bg-gray-400"
             }`}
           ></span>
         </div>
@@ -112,7 +123,7 @@ export default function NavigationSidebar({
         </button>
 
         {/* Logout button */}
-        <button className={`p-2 rounded-full text-gray-400 ${themeClasses.hover}`} title="Logout">
+        <button onClick={handleLogout} className={`p-2 rounded-full text-gray-400 ${themeClasses.hover}`} title="Logout">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"

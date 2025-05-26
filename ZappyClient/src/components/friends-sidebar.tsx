@@ -6,7 +6,7 @@ import { Friend } from "../types/Index"
 interface FriendsSidebarProps {
   friends: Friend[]
   onFriendClick: (friend: Friend) => void
-  selectedFriendId?: number
+  selectedFriendId?: string
   themeClasses: {
     bg: string
     sidebar: string

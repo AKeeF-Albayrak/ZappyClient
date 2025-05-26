@@ -1,11 +1,11 @@
 "use client"
 
-import { Group } from "../types/Index"
+import { GroupViewModel } from "../types/Index"
 
 
 
 interface GroupInfoProps {
-  group: Group
+  group: GroupViewModel
   themeClasses: {
     bg: string
     sidebar: string
@@ -21,10 +21,9 @@ export default function GroupInfo({ group, themeClasses }: GroupInfoProps) {
     <div className="flex flex-col h-full">
       {/* Group header */}
       <div className={`px-4 py-3 border-b ${themeClasses.border} ${themeClasses.sidebar} flex items-center`}>
-        <img src={group.image || "/placeholder.svg"} alt={group.name} className="w-10 h-10 rounded-full object-cover" />
+        <img src={group.groupPicture || "/placeholder.svg"} alt={group.name} className="w-10 h-10 rounded-full object-cover" />
         <div className="ml-3">
           <h2 className="text-lg font-medium text-gray-200">{group.name}</h2>
-          <p className="text-sm text-gray-400">{group.status}</p>
         </div>
       </div>
 
@@ -34,7 +33,7 @@ export default function GroupInfo({ group, themeClasses }: GroupInfoProps) {
           {/* Group image */}
           <div className="flex justify-center mb-6">
             <img
-              src={group.image || "/placeholder.svg"}
+              src={group.groupPicture || "/placeholder.svg"}
               alt={group.name}
               className="w-32 h-32 rounded-full object-cover border-4 border-gray-700"
             />
@@ -60,26 +59,27 @@ export default function GroupInfo({ group, themeClasses }: GroupInfoProps) {
                   d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                 />
               </svg>
-              Members ({group.members.length})
+              Members ({group.users.length})
             </h3>
             <div className="space-y-3">
-              {group.members.map((member) => (
+              {group.users.map((member) => (
                 <div key={member.id} className="flex items-center">
                   <div className="relative">
                     <img
-                      src={member.image || "/placeholder.svg"}
-                      alt={member.name}
+                      src={member.profilePicture || "/placeholder.svg"}
+                      alt={member.username}
                       className="w-10 h-10 rounded-full object-cover"
                     />
+                    {/* Online status indicator 
                     <span
                       className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-900 ${
                         member.status === "online" ? "bg-green-500" : "bg-gray-400"
                       }`}
-                    ></span>
+                    ></span> */}
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-200">{member.name}</p>
-                    <p className="text-xs text-gray-400">{member.status}</p>
+                    <p className="text-sm font-medium text-gray-200">{member.username}</p>
+                    {/*<p className="text-xs text-gray-400">{member.status}</p>*/}
                   </div>
                 </div>
               ))}

@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-import { Group } from "../types/Index"
+import { GroupsViewModel } from "../types/Index"
 
 
 interface GroupSidebarProps {
-  groups: Group[]
-  onGroupClick: (group: Group) => void
-  onGroupPhotoClick: (group: Group, e: React.MouseEvent) => void
-  selectedGroupId?: number
+  groups: GroupsViewModel[]
+  onGroupClick: (groupId: string) => void
+  onGroupPhotoClick: (group: GroupsViewModel, e: React.MouseEvent) => void
+  selectedGroupId?: string
   themeClasses: {
     bg: string
     sidebar: string
@@ -34,28 +34,28 @@ export default function GroupSidebar({
       <div className="divide-y divide-gray-700">
         {groups.map((group) => (
   <div
-    key={group.id}
+    key={group.groupId}
     className={`p-3 flex items-center cursor-pointer transition-colors ${
-      selectedGroupId === group.id ? themeClasses.accent : themeClasses.hover
+      selectedGroupId === group.groupId ? themeClasses.accent : themeClasses.hover
     }`}
-    onClick={() => onGroupClick(group)}
+    onClick={() => onGroupClick(group.groupId)}
   >
     <div className="relative" onClick={(e) => onGroupPhotoClick(group, e)}>
       <img
-        src={group.image || "/placeholder.svg"}
-        alt={group.name}
+        src={/*group.groupPhoto ||*/ "/placeholder.svg"}
+        alt={group.groupName}
         className="w-12 h-12 rounded-full object-cover"
       />
     </div>
     <div className="ml-3 flex-1 min-w-0">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium text-gray-200 truncate">{group.name}</h3>
-        <span className="text-xs text-gray-400">{group.lastMessage.time}</span>
+        <h3 className="text-sm font-medium text-gray-200 truncate">{group.groupName}</h3>
+        <span className="text-xs text-gray-400">{group.lastMessage.createdDate}</span>
       </div>
       <div className="flex items-center mt-1">
         <p className="text-xs text-gray-400 truncate">
-          <span className="font-medium">{group.lastMessage.sender}: </span>
-          {group.lastMessage.content}
+          <span className="font-medium">{group.lastMessage.senderName}: </span>
+          {group.lastMessage.encryptedContent}
         </p>
       </div>
     </div>

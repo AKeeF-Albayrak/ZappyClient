@@ -4,10 +4,10 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { Send, Paperclip, Smile, MoreVertical } from "lucide-react"
-import { Group, User } from "../types/Index"
+import { User, GroupViewModel } from "../types/Index"
 
 interface GroupChatProps {
-  group: Group
+  group: GroupViewModel
   currentUser: User
   themeClasses: {
     bg: string
@@ -17,7 +17,7 @@ interface GroupChatProps {
     text: string
     border: string
   }
-  highlightedMessageId: number | null
+  highlightedMessageId: string | null
 }
 
 export default function GroupChat({ group, currentUser, themeClasses, highlightedMessageId }: GroupChatProps) {
@@ -72,13 +72,12 @@ export default function GroupChat({ group, currentUser, themeClasses, highlighte
       >
         <div className="flex items-center">
           <img
-            src={group.image || "/placeholder.svg"}
+            src={group.groupPicture || "/placeholder.svg"}
             alt={group.name}
             className="w-10 h-10 rounded-full object-cover"
           />
           <div className="ml-3">
             <h2 className="text-lg font-medium text-gray-200">{group.name}</h2>
-            <p className="text-sm text-gray-400">{group.status}</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
@@ -124,7 +123,7 @@ export default function GroupChat({ group, currentUser, themeClasses, highlighte
         <div className="space-y-4">
           {group.messages.map((message) => {
             const isCurrentUser = message.senderId === currentUserId
-            const sender = group.members.find((m) => m.id === message.senderId)
+            const sender = group.users.find((m) => m.id === message.senderId)
             const isHighlighted = message.id === highlightedMessageId
 
             return (
@@ -135,13 +134,13 @@ export default function GroupChat({ group, currentUser, themeClasses, highlighte
               >
                 {!isCurrentUser && (
                   <img
-                    src={sender?.image || "/placeholder.svg?height=40&width=40"}
-                    alt={sender?.name || "User"}
+                    src={sender?.profilePicture || "/placeholder.svg?height=40&width=40"}
+                    alt={sender?.username || "User"}
                     className="w-8 h-8 rounded-full mr-2 self-end"
                   />
                 )}
                 <div className="max-w-xs">
-                  {!isCurrentUser && <p className="text-xs text-gray-400 mb-1">{sender?.name}</p>}
+                  {!isCurrentUser && <p className="text-xs text-gray-400 mb-1">{sender?.username}</p>}
                   <div
                     className={`rounded-xl px-4 py-2 inline-block transition-all duration-300 ${
                       isCurrentUser
