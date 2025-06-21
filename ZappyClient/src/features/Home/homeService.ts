@@ -1,5 +1,6 @@
 import axios from "axios";
 import {
+  StarredMessageViewModel,
   User,
 } from "../../types/Index";
 import {
@@ -43,6 +44,11 @@ export const createGroup = async (name: string, memberIds: string[], userId: str
   return response.data;
 };
 
+export const fetchStarredMessages = async (): Promise<StarredMessageViewModel[]> => {
+  const response = await axios.get(`${API_URL}/messages/starred`);
+  return response.data;
+};
+
 export const logout = async () => {
   await axios.post(`${API_URL}/Auth/logout`);
 };
@@ -71,6 +77,15 @@ export const updateFriendRequest = async (
   return response.data;
 };
 
+const fetchUserProfile = async () => {
+  const response = await axios.get(`${API_URL}/user/profile`);
+  return {
+    succeeded: response.status === 200,
+    user: response.data,
+  };
+};
+
+
 const homeService = {
   fetchGroups,
   fetchFriends,
@@ -81,6 +96,8 @@ const homeService = {
   searchUsers,
   addFriend,
   updateFriendRequest,
+  fetchStarredMessages,
+  fetchUserProfile,
 };
 
 export default homeService;

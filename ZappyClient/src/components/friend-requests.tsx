@@ -1,7 +1,7 @@
 "use client"
 
 import { UserPlus, UserCheck, UserX, ShieldBan } from "lucide-react"
-import { FriendRequest } from "../types/Index"
+import { FriendshipStatus } from "../types/Index"
 
 interface FriendRequestsProps {
   requests: FriendRequest[];

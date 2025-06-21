@@ -1,6 +1,7 @@
 "use client"
 
 import { GroupViewModel } from "../types/Index"
+import { bufferToBase64 } from "../utils/bufferUtils"
 
 
 
@@ -21,7 +22,15 @@ export default function GroupInfo({ group, themeClasses }: GroupInfoProps) {
     <div className="flex flex-col h-full">
       {/* Group header */}
       <div className={`px-4 py-3 border-b ${themeClasses.border} ${themeClasses.sidebar} flex items-center`}>
-        <img src={group.groupPicture || "/placeholder.svg"} alt={group.name} className="w-10 h-10 rounded-full object-cover" />
+        <img
+          src={
+            group.groupPicture
+              ? `data:image/png;base64,${bufferToBase64(group.groupPicture)}`
+              : "/placeholder.svg"
+          }
+          alt={group.name}
+          className="w-10 h-10 rounded-full object-cover"
+        />
         <div className="ml-3">
           <h2 className="text-lg font-medium text-gray-200">{group.name}</h2>
         </div>
@@ -33,7 +42,11 @@ export default function GroupInfo({ group, themeClasses }: GroupInfoProps) {
           {/* Group image */}
           <div className="flex justify-center mb-6">
             <img
-              src={group.groupPicture || "/placeholder.svg"}
+              src={
+                group.groupPicture
+                  ? `data:image/png;base64,${bufferToBase64(group.groupPicture)}`
+                  : "/placeholder.svg"
+              }
               alt={group.name}
               className="w-32 h-32 rounded-full object-cover border-4 border-gray-700"
             />
@@ -63,10 +76,14 @@ export default function GroupInfo({ group, themeClasses }: GroupInfoProps) {
             </h3>
             <div className="space-y-3">
               {group.users.map((member) => (
-                <div key={member.id} className="flex items-center">
+                <div key={member.username} className="flex items-center">
                   <div className="relative">
                     <img
-                      src={member.profilePicture || "/placeholder.svg"}
+                      src={
+                        member.profilePicture
+                          ? `data:image/png;base64,${bufferToBase64(member.profilePicture)}`
+                          : "/placeholder.svg"
+                      }
                       alt={member.username}
                       className="w-10 h-10 rounded-full object-cover"
                     />

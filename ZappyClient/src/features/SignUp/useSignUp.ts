@@ -16,7 +16,6 @@ const useSignup = () => {
     try {
       const response: SignupResponse = await signupService.signup(data);
       setSuccess(true);
-      // Handle successful signup response (e.g., redirect or display success message)
       console.log("Signup success", response);
     } catch (err) {
       setError("Signup failed. Please try again.");

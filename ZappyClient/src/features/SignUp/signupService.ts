@@ -7,7 +7,7 @@ const API_URL = "https://localhost:7127/api/Auth";
 
 // Signup işlemi
 const signup = async (data: SignupRequest): Promise<SignupResponse> => {
-  const response = await axios.post(`${API_URL}/Signup`, data);
+  const response = await axios.post(`${API_URL}/SignUp`, data);
   return response.data;
 };
 

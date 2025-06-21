@@ -2,11 +2,12 @@
 export interface SignupRequest {
   name: string;
   username: string;
-  email: string;
+  mail: string;
   password: string;
-  confirmPassword: string;
-  dateOfBirth: string;
+  description: string | null;
+  birthDate: string;
   profilePicture: string | null;
+  contentType: string | null;
 }
 
 export interface SignupResponse {

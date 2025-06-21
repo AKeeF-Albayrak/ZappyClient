@@ -1,12 +1,13 @@
 "use client"
 
 import { Plus } from "lucide-react"
-import { Friend } from "../types/Index"
+import { FriendViewModel, User_Status } from "../types/Index"
+import { bufferToBase64 } from "../utils/bufferUtils"
 
 interface FriendsSidebarProps {
-  friends: Friend[]
-  onFriendClick: (friend: Friend) => void
-  selectedFriendId?: string
+  friends: FriendViewModel[]
+  onFriendClick: (friend: FriendViewModel) => void
+  selectedFriendUsername: string
   themeClasses: {
     bg: string
     sidebar: string
@@ -21,7 +22,7 @@ interface FriendsSidebarProps {
 export default function FriendsSidebar({
   friends,
   onFriendClick,
-  selectedFriendId,
+  selectedFriendUsername,
   themeClasses,
   onAddFriend,
 }: FriendsSidebarProps) {
@@ -45,37 +46,41 @@ export default function FriendsSidebar({
         {friends.length > 0 ? (
           friends.map((friend) => (
             <div
-              key={friend.id}
+              key={friend.username}
               className={`p-3 flex items-center cursor-pointer transition-colors ${
-                selectedFriendId === friend.id ? "bg-gray-750" : `hover:bg-gray-750`
+                selectedFriendUsername === friend.username ? "bg-gray-750" : `hover:bg-gray-750`
               }`}
               onClick={() => onFriendClick(friend)}
             >
               <div className="relative">
                 <img
-                  src={friend.image || "/placeholder.svg"}
-                  alt={friend.name}
+                  src={
+                    friend.image
+                      ? `data:image/png;base64,${bufferToBase64(friend.image)}`
+                      : "/placeholder.svg"
+                  }
+                  alt={friend.username}
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <span
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-gray-800 ${
-                    friend.status === "online" ? "bg-green-500" : "bg-gray-400"
+                    friend.status === User_Status.Online ? "bg-green-500" : "bg-gray-400"
                   }`}
                 ></span>
               </div>
               <div className="ml-3 flex-1 min-w-0">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-medium text-gray-200 truncate">{friend.name}</h3>
-                  {friend.lastMessage && <span className="text-xs text-gray-400">{friend.lastMessage.time}</span>}
+                  <h3 className="text-sm font-medium text-gray-200 truncate">{friend.username}</h3>
+                  {/*friend.lastMessage && <span className="text-xs text-gray-400">{friend.lastMessage.time}</span>*/}
                 </div>
-                {friend.lastMessage && (
+                {/*friend.lastMessage && (
                   <div className="flex items-center mt-1">
                     <p className="text-xs text-gray-400 truncate">
                       {friend.lastMessage.isOutgoing && <span className="font-medium">You: </span>}
                       {friend.lastMessage.content}
                     </p>
                   </div>
-                )}
+                )*/}
               </div>
             </div>
           ))

@@ -7,7 +7,7 @@ import { GroupsViewModel } from "../types/Index"
 interface GroupSidebarProps {
   groups: GroupsViewModel[]
   onGroupClick: (groupId: string) => void
-  onGroupPhotoClick: (group: GroupsViewModel, e: React.MouseEvent) => void
+  //onGroupPhotoClick: (group: GroupsViewModel, e: React.MouseEvent) => void
   selectedGroupId?: string
   themeClasses: {
     bg: string
@@ -22,7 +22,7 @@ interface GroupSidebarProps {
 export default function GroupSidebar({
   groups,
   onGroupClick,
-  onGroupPhotoClick,
+  //onGroupPhotoClick,
   selectedGroupId,
   themeClasses,
 }: GroupSidebarProps) {
@@ -40,7 +40,7 @@ export default function GroupSidebar({
     }`}
     onClick={() => onGroupClick(group.groupId)}
   >
-    <div className="relative" onClick={(e) => onGroupPhotoClick(group, e)}>
+    <div className="relative" /* onClick={(e) => onGroupPhotoClick(group, e)}*/>
       <img
         src={/*group.groupPhoto ||*/ "/placeholder.svg"}
         alt={group.groupName}
@@ -50,12 +50,12 @@ export default function GroupSidebar({
     <div className="ml-3 flex-1 min-w-0">
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium text-gray-200 truncate">{group.groupName}</h3>
-        <span className="text-xs text-gray-400">{group.lastMessage.createdDate}</span>
+        <span className="text-xs text-gray-400">{group.lastMessage.time}</span>
       </div>
       <div className="flex items-center mt-1">
         <p className="text-xs text-gray-400 truncate">
           <span className="font-medium">{group.lastMessage.senderName}: </span>
-          {group.lastMessage.encryptedContent}
+          {group.lastMessage.content}
         </p>
       </div>
     </div>

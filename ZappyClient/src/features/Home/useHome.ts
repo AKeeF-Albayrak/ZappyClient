@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import homeService from "./homeService";
 import { getUserIdFromToken } from "../../utils/jwtUtils";
 import {
-  User_Status,
   //FriendshipStatus,
   GroupsViewModel,
   //FriendRequest,
   GroupViewModel,
   FriendViewModel,
   FriendshipStatus,
+  StarredMessageViewModel,
+  User,
 } from "../../types/Index";
 import { GetGroupResponse } from "./homeTypes";
 
@@ -16,10 +17,12 @@ export const useHome = () => {
   const [groups, setGroups] = useState<GroupsViewModel[]>([]);
   const [friends, setFriends] = useState<FriendViewModel[]>([]);
   //const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-  const [user, setUser] = useState<{ status: User_Status; statusMessage: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<GroupViewModel | null>(null);
   const [viewMode, setViewMode] = useState<"chat" | "info" | null>(null);
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+  const [starredMessages, setStarredMessages] = useState<StarredMessageViewModel[]>([]);
+  const [selectedFriendUsername, setSelectedFriendUsername] = useState<string | null>(null);
 
   const userId = getUserIdFromToken();
   if (!userId) throw new Error("User ID not found in token");
@@ -30,12 +33,25 @@ export const useHome = () => {
       if (groupResponse.succeeded) setGroups(groupResponse.groups);
 
       const fetchedFriendsResponse = await homeService.fetchFriends({ status: FriendshipStatus.Accepted });
-      if(fetchedFriendsResponse.succeeded) setFriends(fetchedFriendsResponse.friends);
+      if (fetchedFriendsResponse.succeeded) setFriends(fetchedFriendsResponse.friends);
 
+      const userResponse = await homeService.fetchUserProfile(); // yeni eklenen satır
+      if (userResponse.succeeded) {
+        setUser({
+          id: userResponse.user.id,
+          name: userResponse.user.name,
+          image: userResponse.user.image, // bu base64 ya da URL olmalı
+          status: userResponse.user.status,
+          statusMessage: userResponse.user.statusMessage,
+        });
+      }
     };
 
     loadData();
   }, [userId]);
+
+  
+
 
   const handleAddFriend = async (username: string) => {
     const response = await homeService.addFriend({ username });
@@ -77,7 +93,7 @@ export const useHome = () => {
       users: detailed.users.map((u) => ({
         username: u.username,
         profilePicture: u.profilePicture,
-        isOnline: u.isOnline,
+        status: u.status,
       })),
       messages: detailed.messages.map((m) => ({
         id: m.id,
@@ -109,6 +125,10 @@ export const useHome = () => {
     }
   };
 
+  const handleFriendClick = (friend: FriendViewModel) => {
+    setSelectedFriendUsername(friend.username);
+  };
+
   const handleStarredMessageClick = (groupId: string, messageId: string) => {
     const group = groups.find((g) => g.groupId === groupId);
     if (group) {
@@ -121,22 +141,16 @@ export const useHome = () => {
     setUser(updatedUser);
   };
 
-  /*onst getStarredMessages = (): { message: Message; group: GroupsViewModel }[] => {
-    const starredMessages: { message: Message; group: GroupsViewModel }[] = [];
-
-    groups.forEach((group) => {
-      if (!("messages" in group)) return; // tip güvenliği için (bazı gruplar sadece listede olabilir)
-
-      (group as any).messages?.forEach((message: Message) => {
-        if (message.isStarred) {
-          starredMessages.push({ message, group });
-        }
-      });
-    });
-
-    return starredMessages;
+  const getStarredMessages = async () => {
+    try {
+      const messages = await homeService.fetchStarredMessages();
+      setStarredMessages(messages);
+    } catch (error) {
+      console.error("Yıldızlı mesajlar alınamadı:", error);
+    }
   };
 
+  /*
   const handleGroupPhotoClick = (group: GroupViewModel, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedGroup(group);
@@ -150,6 +164,8 @@ export const useHome = () => {
     selectedGroup,
     viewMode,
     highlightedMessageId,
+    starredMessages,
+    selectedFriendUsername,
     addFriend: handleAddFriend,
     updateFriendRequest: handleUpdateFriendRequest,
     groupClick: handleGroupClick,
@@ -158,7 +174,7 @@ export const useHome = () => {
     profileUpdate: handleProfileUpdate,
     setViewMode,
     setSelectedGroup,
-    //getStarredMessages,
-    //handleGroupPhotoClick,
+    getStarredMessages,
+    handleFriendClick,
   };
 };

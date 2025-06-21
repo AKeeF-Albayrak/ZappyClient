@@ -45,7 +45,7 @@ export interface MessageViewModel {
 export interface UserViewModel {
   username: string;
   profilePicture: Uint8Array;
-  isOnline: boolean;
+  status: User_Status;
 }
 
 export interface GroupReadStatusViewModel {
@@ -63,6 +63,7 @@ export interface StarredMessageViewModel {
 
 export interface FriendViewModel {
   username: string;
+  image: Uint8Array;
   status: User_Status;
 }
 

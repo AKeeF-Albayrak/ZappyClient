@@ -15,6 +15,8 @@ import AddFriendModal from "../../components/add-friend-modal"
 import { User} from "../../types/Index"
 import connection from "../../utils/signalrClient"
 import { useHome } from "./useHome"
+import { addFriend } from "./homeService"
+import friendRequests from "../../components/friend-requests"
 
 
 export default function Home() {
@@ -36,15 +38,19 @@ export default function Home() {
     selectedGroup,
     viewMode,
     highlightedMessageId,
+    starredMessages,
+    selectedFriendUsername,
     //addFriend,
     //updateFriendRequest,
     groupClick,
+    addFriend,
     createGroup,
     starredClick,
     profileUpdate,
     setSelectedGroup,
     setViewMode,
-    //getStarredMessages,
+    getStarredMessages,
+    handleFriendClick,
     //handleGroupPhotoClick,
   } = useHome();
 
@@ -101,26 +107,6 @@ export default function Home() {
     }, 50)
   }
 
-  // Handle clicking on a starred message
-  const handleStarredMessageClick = (groupId: string, messageId: string) => {
-    starredClick(groupId, messageId);
-    setActiveTab("chats");
-  };
-
-  // Handle clicking on a friend
-  const handleFriendClick = (friend: Friend) => {
-    console.log("Open chat with friend:", friend)
-  }
-
-  // Handle creating a new group
-  const handleCreateGroup = async (name: string, memberIds: string[]) => {
-    await createGroup(name, memberIds);
-    setActiveTab("chats");
-  };
-
-
-  // Get all starred messages from all groups
-  const starredMessages = getStarredMessages();
 
   // Get theme classes based on selected theme
   const getThemeClasses = (theme: "dark" | "purple" | "blue" | "green") => {
@@ -166,8 +152,7 @@ export default function Home() {
 
   const themeClasses = getThemeClasses(currentTheme)
 
-  // Count incoming friend requests
-  const incomingRequestsCount = friendRequests.filter((req) => req.type === "incoming").length
+  //const incomingRequestsCount = friendRequests.filter((req) => req.type === "incoming").length
 
   if (isConnecting) {
     return (
@@ -176,6 +161,15 @@ export default function Home() {
       </main>
     )
   }
+
+  if (!user) {
+  return (
+    <main className="flex items-center justify-center h-screen bg-black text-white">
+      <div className="animate-pulse">Loading user...</div>
+    </main>
+  );
+}
+
 
   return (
     <main className={`flex h-screen ${themeClasses.bg} text-gray-100 transition-colors duration-700`}>
@@ -186,7 +180,7 @@ export default function Home() {
           user={user}
           onProfileClick={handleShowProfileUpdate}
           themeClasses={themeClasses}
-          pendingRequestsCount={incomingRequestsCount}
+          pendingRequestsCount={5} // Replace with actual count from friendRequests
         />
 
         <div className={`w-80 h-full ${themeClasses.sidebar} border-r ${themeClasses.border} flex flex-col`}>
@@ -198,13 +192,12 @@ export default function Home() {
                     if (!searchQuery) return true;
 
                     const nameMatch = group.groupName.toLowerCase().includes(searchQuery.toLowerCase());
-                    const messageContent = group.lastMessage?.encryptedContent?.toLowerCase() || "";
+                    const messageContent = group.lastMessage?.content?.toLowerCase() || "";
                     return nameMatch || messageContent.includes(searchQuery.toLowerCase());
                   })
                 }
-                onSearch={setSearchQuery}
                 onGroupClick={handleGroupClick}
-                onGroupPhotoClick={handleGroupPhotoClick}
+                //onGroupPhotoClick={handleGroupPhotoClick}
                 selectedGroupId={selectedGroup?.id}
                 themeClasses={themeClasses}
               />
@@ -215,25 +208,26 @@ export default function Home() {
             <FriendsSidebar
               friends={friends}
               onFriendClick={handleFriendClick}
+              selectedFriendUsername={selectedFriendUsername ?? ""}
               themeClasses={themeClasses}
               onAddFriend={() => setShowAddFriendModal(true)}
             />
           )}
 
-          {activeTab === "requests" && (
+          {/*activeTab === "requests" && (
             <FriendRequests
               requests={friendRequests}
               themeClasses={themeClasses}
               onStatusChange={(id, status) => updateFriendRequest(id, status)}
               onAddFriend={() => setShowAddFriendModal(true)}
             />
-          )}
+          )*/}
 
           {activeTab === "starred" && (
             <StarredMessagesSidebar
               starredMessages={starredMessages}
               themeClasses={themeClasses}
-              onMessageClick={handleStarredMessageClick}
+              onMessageClick={starredClick}
             />
           )}
 
@@ -313,7 +307,7 @@ export default function Home() {
             <CreateGroupModal
               friends={friends}
               onClose={() => setShowCreateGroupModal(false)}
-              onCreateGroup={handleCreateGroup}
+              onCreateGroup={createGroup}
               themeClasses={themeClasses}
             />
           </div>

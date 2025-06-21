@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Send, Paperclip, Smile, MoreVertical } from "lucide-react"
 import { User, GroupViewModel } from "../types/Index"
+import { bufferToBase64 } from "../utils/bufferUtils"
 
 interface GroupChatProps {
   group: GroupViewModel
@@ -72,7 +73,11 @@ export default function GroupChat({ group, currentUser, themeClasses, highlighte
       >
         <div className="flex items-center">
           <img
-            src={group.groupPicture || "/placeholder.svg"}
+            src={
+              group.groupPicture
+                ? `data:image/png;base64,${bufferToBase64(group.groupPicture)}`
+                : "/placeholder.svg"
+            }
             alt={group.name}
             className="w-10 h-10 rounded-full object-cover"
           />
@@ -122,8 +127,8 @@ export default function GroupChat({ group, currentUser, themeClasses, highlighte
       <div className={`flex-1 p-4 overflow-y-auto ${themeClasses.bg}`}>
         <div className="space-y-4">
           {group.messages.map((message) => {
-            const isCurrentUser = message.senderId === currentUserId
-            const sender = group.users.find((m) => m.id === message.senderId)
+            const isCurrentUser = message.senderUsername === currentUser.name;
+            const sender = group.users.find((m) => m.username === message.senderUsername);
             const isHighlighted = message.id === highlightedMessageId
 
             return (
@@ -134,7 +139,11 @@ export default function GroupChat({ group, currentUser, themeClasses, highlighte
               >
                 {!isCurrentUser && (
                   <img
-                    src={sender?.profilePicture || "/placeholder.svg?height=40&width=40"}
+                    src={
+                      sender?.profilePicture
+                        ? `data:image/png;base64,${bufferToBase64(sender.profilePicture)}`
+                        : "/placeholder.svg"
+                    }
                     alt={sender?.username || "User"}
                     className="w-8 h-8 rounded-full mr-2 self-end"
                   />
@@ -151,7 +160,7 @@ export default function GroupChat({ group, currentUser, themeClasses, highlighte
                     <p>{message.content}</p>
                   </div>
                   <div className="flex items-center mt-1">
-                    <p className="text-xs text-gray-500">{message.time}</p>
+                    <p className="text-xs text-gray-500">{message.createdDate}</p>
                     {message.isStarred && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -184,7 +193,11 @@ export default function GroupChat({ group, currentUser, themeClasses, highlighte
                 </div>
                 {isCurrentUser && (
                   <img
-                    src={currentUser.image || "/placeholder.svg"}
+                    src={
+                      typeof currentUser.image === "string"
+                        ? currentUser.image
+                        : `data:image/png;base64,${bufferToBase64(currentUser.image)}`
+                    }
                     alt={currentUser.name}
                     className="w-8 h-8 rounded-full ml-2 self-end"
                   />
