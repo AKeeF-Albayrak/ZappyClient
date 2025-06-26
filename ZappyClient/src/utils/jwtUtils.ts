@@ -1,10 +1,12 @@
+import { jwtDecode } from "jwt-decode";
+
 export const getUserIdFromToken = (): string | null => {
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("refreshToken");
   if (!token) return null;
 
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload?.nameid || payload?.sub || null;
+    const decoded: any = jwtDecode(token);
+    return decoded.userId || decoded.nameid || decoded.sub || null;
   } catch (err) {
     console.error("Token decode edilemedi:", err);
     return null;

@@ -31,12 +31,11 @@ const useLogin = () => {
       });
 
       await delay(2000);
-      navigate("/home");
+      
       if (response.succeeded) {
         setUser(response);
         localStorage.setItem("accessToken", response.accessToken);
         localStorage.setItem("refreshToken", response.refreshToken);
-
         toast.success("Giriş başarılı!");
         await delay(2000);
         navigate("/home");
